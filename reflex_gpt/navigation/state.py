@@ -14,3 +14,9 @@ class NavState(rx.State):
         on_click event
         """
         return rx.redirect(routes.ABOUT_US_ROUTE) 
+    
+    def to_chat(self):
+        """
+        on_click event
+        """
+        return rx.redirect(routes.CHAT_ROUTE)

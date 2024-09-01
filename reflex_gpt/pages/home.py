@@ -6,6 +6,7 @@ from rxconfig import config
 
 from reflex_gpt import ui
 
+
 def home_page() -> rx.Component:
     # Welcome Page (Index)
     return ui.base_layout(
@@ -25,5 +26,5 @@ def home_page() -> rx.Component:
             justify="center",
             min_height="85vh",
         ),
-        rx.logo(),
+        rx.logo()
     )
