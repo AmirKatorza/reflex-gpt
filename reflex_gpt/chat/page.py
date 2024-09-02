@@ -39,6 +39,7 @@ def chat_page():
                 width='100%'
             ),
             chat_form(),
+            margin="3rem auto",
             spacing="5",
             justify="center",
             min_height="85vh",
