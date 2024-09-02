@@ -19,13 +19,13 @@ class ChatState(rx.State):
     def append_message(self, message, is_bot: bool = False):
         self.messages.append(
             ChatMessage(
-                message = message,
-                is_bot = is_bot
+                message=message,
+                is_bot=is_bot
             )
         )
 
     async def handle_submit(self, form_data: dict):
-        print('here is our form data', form_data)        
+        print('here is our form data', form_data)
         user_message = form_data.get('message')
         if user_message:
             self.did_submit = True
@@ -34,4 +34,4 @@ class ChatState(rx.State):
             await asyncio.sleep(2)
             self.did_submit = False
             self.append_message(user_message, is_bot=True)
-            yield            
+            yield
