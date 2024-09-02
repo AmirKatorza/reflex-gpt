@@ -4,12 +4,12 @@ from .form import chat_form
 from .state import ChatMessage, ChatState
 
 
-message_style = dict(
-    display="inline-block",
-    padding="1em",
-    border_radius="8px",
-    max_width=["30em", "30em", "50em", "50em", "50em", "50em"]
-)
+message_style = {
+    "display": "inline-block",
+    "padding": "1em",
+    "border_radius": "8px",
+    "max_width": ["30em", "30em", "50em", "50em", "50em", "50em"]
+}
 
 
 def message_box(chat_message: ChatMessage) -> rx.Component:
