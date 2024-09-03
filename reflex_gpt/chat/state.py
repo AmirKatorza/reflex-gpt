@@ -3,7 +3,7 @@ import reflex as rx
 
 from typing import List
 from . import ai
-from reflex_gpt.models import Chat as ChatModel
+from reflex_gpt.models import ChatSession as ChatModel
 
 
 class ChatMessage(rx.Base):
