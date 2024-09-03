@@ -1,7 +1,9 @@
-from typing import List
-# import asyncio
 import reflex as rx
+# import asyncio
+
+from typing import List
 from . import ai
+from reflex_gpt.models import Chat
 
 
 class ChatMessage(rx.Base):
@@ -16,6 +18,13 @@ class ChatState(rx.State):
     @rx.var
     def user_did_submit(self) -> bool:
         return self.did_submit
+
+    def on_load(self):
+        with rx.session() as session:
+            results = session.exec(
+                Chat.select()
+            ).all()
+            print(results)
 
     def append_message(self, message, is_bot: bool = False):
         self.messages.append(
@@ -51,7 +60,7 @@ class ChatState(rx.State):
             yield
             gpt_messages = self.get_gpt_messages()
             print(gpt_messages)
-            bot_response = ai.get_llm_response(gpt_messages)            
+            bot_response = ai.get_llm_response(gpt_messages)
             # await asyncio.sleep(2)
             self.did_submit = False
             self.append_message(bot_response, is_bot=True)
