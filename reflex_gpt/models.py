@@ -9,7 +9,7 @@ def get_utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
 class Chat(rx.Model, table=True):
-    title: str
+    # title: str
     created_at: datetime = Field(
         default_factory=get_utc_now,
         sa_type=sqlalchemy.DateTime(timezone=True),
@@ -27,3 +27,6 @@ class Chat(rx.Model, table=True):
         },
         nullable=False,
     ) 
+
+class ChatMessageModel(rx.Model, table=True):
+    pass
