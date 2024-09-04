@@ -58,6 +58,12 @@ class ChatState(rx.State):
             else:
                 self.not_found = False
             self.chat_session = result
+            messages = result.messages
+            for msg_obj in messages:
+                msg_txt = msg_obj.content
+                # Set is_bot to True for "system" role
+                is_bot = False if msg_obj.role == "user" else True
+                self.append_message_to_ui(message=msg_txt, is_bot=is_bot)
 
     def on_detail_load(self):
         print(self.get_session_id(), type(self.get_session_id()))
@@ -88,7 +94,6 @@ class ChatState(rx.State):
             db_session.commit()  # actually save
 
     def append_message_to_ui(self, message, is_bot: bool = False):
-
         self.messages.append(
             ChatMessage(
                 message=message,
