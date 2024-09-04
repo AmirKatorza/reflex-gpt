@@ -36,8 +36,9 @@ def chat_page():
             rx.hstack(
                 rx.heading("Chat Here", size="5"),
                 rx.cond(ChatState.not_found, "Not Found", "Found"),
-                rx.button("+ New Chat", on_click=ChatState.create_new_and_redirect)
-            ),            
+                rx.button("+ New Chat",
+                          on_click=ChatState.create_new_and_redirect)
+            ),
             rx.box(
                 rx.foreach(ChatState.messages, message_box),
                 width='100%'
