@@ -41,7 +41,7 @@ jobs:
     - name: Create build env file
       run: |
          cat << EOF > .build-env
-         OPENAI_API_KEY=${{ secrets.${{ secrets.OPENAI_API_KEY }} }}
+         OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
          DATABASE_URL=${{ secrets.DATABASE_URL }}
          EOF
 
