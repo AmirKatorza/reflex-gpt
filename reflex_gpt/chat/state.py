@@ -20,26 +20,37 @@ class ChatState(rx.State):
     def user_did_submit(self) -> bool:
         return self.did_submit
 
+    def get_session_id(self) -> int:
+        try:
+            my_session_id = int(self.router.page.params.get('session_id'))
+        except:
+            my_session_id = None
+        return my_session_id
+
     def create_new_chat_session(self):
         with rx.session() as db_session:
-                obj = ChatSession()
-                db_session.add(obj)  # prepare to save - add to staging
-                db_session.commit()  # actually save
-                db_session.refresh(obj)
-                self.chat_session = obj
-    
+            obj = ChatSession()
+            db_session.add(obj)  # prepare to save - add to staging
+            db_session.commit()  # actually save
+            db_session.refresh(obj)
+            self.chat_session = obj
+
     def clear_and_start_new(self):
         self.chat_session = None
         self.create_new_chat_session()
         self.messages = []
         yield
 
-
-
     def on_load(self):
         print("running on load")
         if self.chat_session is None:
             self.create_new_chat_session()
+
+    def on_detail_load(self):
+        print(self.get_session_id(), type(self.get_session_id()))
+        # session_id = self.get_session_id()
+        # if not isinstance(session_id, str):
+        #     self.invalid_lookup = True
 
     def insert_message_to_db(self, content, role='unknown'):
         print("insert message data to db")
@@ -56,10 +67,9 @@ class ChatState(rx.State):
             obj = ChatSessionMessageModel(**data)
             db_session.add(obj)  # prepare to save - add to staging
             db_session.commit()  # actually save
-            
 
     def append_message_to_ui(self, message, is_bot: bool = False):
-        
+
         self.messages.append(
             ChatMessage(
                 message=message,
@@ -94,7 +104,7 @@ class ChatState(rx.State):
             yield
             gpt_messages = self.get_gpt_messages()
             # print(gpt_messages)
-            bot_response = ai.get_llm_response(gpt_messages)            
+            bot_response = ai.get_llm_response(gpt_messages)
             self.did_submit = False
             self.append_message_to_ui(bot_response, is_bot=True)
             self.insert_message_to_db(content=bot_response, role='system')
