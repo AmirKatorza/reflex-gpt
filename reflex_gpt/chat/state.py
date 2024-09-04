@@ -36,11 +36,23 @@ class ChatState(rx.State):
             db_session.commit()  # actually save
             db_session.refresh(obj)
             self.chat_session = obj
+            return obj
+
+    def clear_ui(self):
+        self.chat_session = None
+        self.not_found = None
+        self.did_submit = False
+        self.messages = []
+
+    def create_new_and_redirect(self):
+        self.clear_ui()
+        new_chat_session = self.create_new_chat_session()
+        return rx.redirect(f"/chat/{new_chat_session.id}")
+
 
     def clear_and_start_new(self):
-        self.chat_session = None
+        self.clear_ui()
         self.create_new_chat_session()
-        self.messages = []
         yield
 
     def get_session_from_db(self, session_id=None):
@@ -66,16 +78,24 @@ class ChatState(rx.State):
                 self.append_message_to_ui(message=msg_txt, is_bot=is_bot)
 
     def on_detail_load(self):
-        print(self.get_session_id(), type(self.get_session_id()))
         session_id = self.get_session_id()
-        if isinstance(session_id, int):
-            self.get_session_from_db(session_id=session_id)
+        reload_detail = False
+        if not self.chat_session:
+            reload_detail = True
+        else:
+            """has a session"""
+            if self.chat_session.id != session_id:
+                reload_detail = True
+
+        if reload_detail:
+            self.clear_ui()
+            if isinstance(session_id, int):
+                self.get_session_from_db(session_id=session_id)
 
     def on_load(self):
         print("running on load")
-        print(self.get_session_id(), type(self.get_session_id()))
-        if self.chat_session is None:
-            self.create_new_chat_session()
+        self.clear_ui()
+        self.create_new_chat_session()
 
     def insert_message_to_db(self, content, role='unknown'):
         print("insert message data to db")
