@@ -29,8 +29,8 @@ jobs:
 
     - name: Create Ansible inventory
       run: |
-        echo "[aws]" > inventory.ini
-        echo "${{ secrets.VIRTUAL_MACHINE_IP }} ansible_user=ubuntu" >> inventory.ini
+        echo "[linode]" > inventory.ini
+        echo "${{ secrets.VIRTUAL_MACHINE_IP }} ansible_user=root" >> inventory.ini
 
     - name: Create env file
       run: |
