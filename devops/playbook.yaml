@@ -1,13 +1,13 @@
 ---
-- hosts: linode
+- hosts: aws
   become: true
   vars:
-    project_dir: /app/
+    project_dir: /home/ubuntu/app/
     remote_env_file: "{{ project_dir }}/.env"
     compose_file: "{{ project_dir }}/compose.prod.yaml"
     env_file: "{{ playbook_dir | dirname }}/.env"
   vars_files:
-    - "{{playbook_dir}}/vars.yaml"
+    - "{{ playbook_dir }}/vars.yaml"
   tasks:
     - name: Download Docker installation script
       get_url:
