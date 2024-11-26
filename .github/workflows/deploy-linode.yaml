@@ -52,7 +52,7 @@ jobs:
       env:
         ANSIBLE_HOST_KEY_CHECKING: False
       run: |
-        ansible-playbook -i inventory.ini devops/playbook.yaml
+        ansible-playbook -i inventory.ini devops/playbook-linode.yaml
 
     - name: Remove vars file
       run: rm devops/vars.yaml && rm .env
