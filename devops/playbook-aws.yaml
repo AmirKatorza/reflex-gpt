@@ -15,31 +15,16 @@
         state: latest
         update_cache: yes
 
-    - name: Install Docker
-      yum:
-        name: docker
-        state: present
+    - name: Download Docker installation script
+      get_url:
+        url: https://get.docker.com
+        dest: /tmp/get-docker.sh
+        mode: '0755'
 
-    - name: Install Docker Compose
-      block:
-        - name: Download Docker Compose binary
-          ansible.builtin.get_url:
-            url: "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)"
-            dest: /usr/local/bin/docker-compose
-            mode: '0755'
-        
-        - name: Verify Docker Compose installation
-          ansible.builtin.command: docker-compose --version
-          register: compose_version
-          failed_when: "'docker-compose version' not in compose_version.stdout"
-      
-      rescue:
-        - name: Debug Docker Compose installation issue
-          ansible.builtin.debug:
-            msg: 
-              - "Failed to install Docker Compose"
-              - "Error details: {{ ansible_failed_result }}"
-          failed_when: true
+    - name: Run Docker installation script
+      shell: /tmp/get-docker.sh
+      args:
+        creates: /usr/bin/docker
 
     - name: Ensure Docker service is running
       systemd:
