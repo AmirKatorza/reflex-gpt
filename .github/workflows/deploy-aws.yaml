@@ -1,4 +1,4 @@
-name: Deploy with Ansible
+name: Deploy with Ansible on AWS
 
 on:
   workflow_dispatch:

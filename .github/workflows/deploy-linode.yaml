@@ -1,4 +1,4 @@
-name: Deploy with Ansible
+name: Deploy with Ansible on linode
 
 on:
   workflow_dispatch:
