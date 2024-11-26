@@ -49,21 +49,21 @@
 
     - name: Pull latest Docker images
       shell:
-        cmd: docker compose -f compose.prod.yaml pull
+        cmd: docker-compose -f compose.prod.yaml pull
       args:
         chdir: "{{ project_dir }}"
 
     - name: Update Docker services
       shell:
         cmd: |
-          services=$(docker compose -f compose.prod.yaml config --services)
+          services=$(docker-compose -f compose.prod.yaml config --services)
           for service in $services; do
-            if docker compose -f compose.prod.yaml ps --status running $service | grep -q $service; then
+            if docker-compose -f compose.prod.yaml ps --status running $service | grep -q $service; then
               echo "Updating running service: $service"
-              docker compose -f compose.prod.yaml up -d --no-deps "$service"
+              docker-compose -f compose.prod.yaml up -d --no-deps "$service"
             else
               echo "Starting service: $service"
-              docker compose -f compose.prod.yaml up -d --no-deps "$service"
+              docker-compose -f compose.prod.yaml up -d --no-deps "$service"
             fi
           done
       args:
@@ -71,7 +71,7 @@
 
     - name: Remove orphaned containers
       shell:
-        cmd: docker compose -f compose.prod.yaml up -d --remove-orphans
+        cmd: docker-compose -f compose.prod.yaml up -d --remove-orphans
       args:
         chdir: "{{ project_dir }}"
 
