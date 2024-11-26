@@ -1,5 +1,5 @@
 ---
-- hosts: ec2
+- hosts: aws
   become: true
   vars:
     project_dir: /app/
