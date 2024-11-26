@@ -29,7 +29,7 @@ jobs:
 
     - name: Create Ansible inventory
       run: |
-        echo "[ec2]" > inventory.ini
+        echo "[aws]" > inventory.ini
         echo "${{ secrets.EC2_INSTANCE_IP }} ansible_user=ec2-user" >> inventory.ini
 
     - name: Create env file
