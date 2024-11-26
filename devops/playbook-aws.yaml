@@ -1,0 +1,99 @@
+---
+- hosts: aws
+  become: true
+  vars:
+    project_dir: /app/
+    remote_env_file: "{{ project_dir }}/.env"
+    compose_file: "{{ project_dir }}/compose.prod.yaml"
+    env_file: "{{ playbook_dir | dirname }}/.env"
+  vars_files:
+    - "{{playbook_dir}}/vars.yaml"
+  tasks:
+    - name: Update package manager
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Install Docker Compose
+      yum:
+        name: docker-compose
+        state: present
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Create project directory
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        mode: '0755'
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Copy .env file to server
+      copy:
+        src: "{{ env_file }}"
+        dest: "{{ remote_env_file }}"
+        owner: ec2-user
+        group: ec2-user
+      no_log: false
+
+    - name: Copy Docker Compose file to server
+      copy:
+        src: "{{ playbook_dir | dirname }}/compose.prod.yaml"
+        dest: "{{ compose_file }}"
+        owner: ec2-user
+        group: ec2-user
+
+    - name: Login to Docker Hub
+      shell: echo {{ dockerhub_token }} | docker login -u {{ dockerhub_username }} --password-stdin
+      no_log: true
+
+    - name: Pull latest Docker images
+      shell:
+        cmd: docker compose -f compose.prod.yaml pull
+      args:
+        chdir: "{{ project_dir }}"
+
+    - name: Update Docker services
+      shell:
+        cmd: |
+          services=$(docker compose -f compose.prod.yaml config --services)
+          for service in $services; do
+            if docker compose -f compose.prod.yaml ps --status running $service | grep -q $service; then
+              echo "Updating running service: $service"
+              docker compose -f compose.prod.yaml up -d --no-deps "$service"
+            else
+              echo "Starting service: $service"
+              docker compose -f compose.prod.yaml up -d --no-deps "$service"
+            fi
+          done
+      args:
+        chdir: "{{ project_dir }}"
+
+    - name: Remove orphaned containers
+      shell:
+        cmd: docker compose -f compose.prod.yaml up -d --remove-orphans
+      args:
+        chdir: "{{ project_dir }}"
+
+    - name: Prune Docker system
+      shell:
+        cmd: docker system prune -f
+      args:
+        chdir: "{{ project_dir }}"
