@@ -25,6 +25,18 @@
         name: docker
         state: started
         enabled: yes
+    
+    - name: Add ubuntu user to docker group
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Ensure Docker socket permissions
+      file:
+        path: /var/run/docker.sock
+        mode: '0666'
+      become: yes
 
     - name: Create project directory
       file:
