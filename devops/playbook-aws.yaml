@@ -9,12 +9,6 @@
   vars_files:
     - "{{playbook_dir}}/vars.yaml"
   tasks:
-    - name: Update package manager
-      yum:
-        name: '*'
-        state: latest
-        update_cache: yes
-
     - name: Download Docker installation script
       get_url:
         url: https://get.docker.com
@@ -32,34 +26,22 @@
         state: started
         enabled: yes
 
-    - name: Add ec2-user to docker group
-      user:
-        name: ec2-user
-        groups: docker
-        append: yes
-
     - name: Create project directory
       file:
         path: "{{ project_dir }}"
         state: directory
         mode: '0755'
-        owner: ec2-user
-        group: ec2-user
 
     - name: Copy .env file to server
       copy:
         src: "{{ env_file }}"
         dest: "{{ remote_env_file }}"
-        owner: ec2-user
-        group: ec2-user
       no_log: false
 
     - name: Copy Docker Compose file to server
       copy:
         src: "{{ playbook_dir | dirname }}/compose.prod.yaml"
         dest: "{{ compose_file }}"
-        owner: ec2-user
-        group: ec2-user
 
     - name: Login to Docker Hub
       shell: echo {{ dockerhub_token }} | docker login -u {{ dockerhub_username }} --password-stdin
